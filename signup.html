@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediHub — Create Account</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,200&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%;font-family:'DM Sans',sans-serif}
+body{background:#04152d;position:relative;overflow-x:hidden}
+canvas{position:fixed;inset:0;z-index:0}
+.floaters{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.floater{position:absolute;opacity:0;animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:.15}90%{opacity:.1}100%{transform:translateY(-15vh) rotate(360deg);opacity:0}}
+
+.shell{position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem}
+
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:760px;margin-bottom:1.5rem;animation:fadeDown .6s ease both}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+.brand{font-family:'Fraunces',serif;font-weight:300;font-size:1.6rem;color:white;letter-spacing:-.02em}
+.brand span{background:linear-gradient(90deg,#4facfe,#00f2c3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.already{font-size:.8rem;color:rgba(255,255,255,.45)}
+.already a{color:rgba(255,255,255,.8);font-weight:500;text-decoration:none}
+.already a:hover{color:white}
+
+/* card */
+.card{
+  width:100%;max-width:760px;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:1px solid rgba(255,255,255,.14);border-radius:24px;
+  padding:2.5rem;
+  box-shadow:0 40px 100px rgba(0,0,0,.5);
+  animation:cardIn .8s cubic-bezier(.22,1,.36,1) .1s both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+.card-header{margin-bottom:2rem;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:1.25rem}
+.card-header h2{font-size:1.4rem;font-weight:600;color:white;margin-bottom:.25rem}
+.card-header p{font-size:.82rem;color:rgba(255,255,255,.45)}
+
+/* progress dots */
+.steps{display:flex;gap:.5rem;margin-bottom:2rem}
+.step-dot{width:28px;height:4px;border-radius:2px;background:rgba(255,255,255,.15);transition:background .3s}
+.step-dot.done{background:linear-gradient(90deg,#1a56db,#0e9f6e)}
+.step-dot.active{background:rgba(79,172,254,.7)}
+
+/* grid */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem 1.5rem}
+.field{display:flex;flex-direction:column}
+.field.full{grid-column:1/-1}
+.field label{font-size:.68rem;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem}
+.field input,.field select{
+  padding:.7rem .95rem;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;font-size:.88rem;
+  color:white;font-family:'DM Sans',sans-serif;
+  outline:none;transition:all .2s;-webkit-appearance:none;appearance:none;
+}
+.field input::placeholder{color:rgba(255,255,255,.22)}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center}
+.field select option{background:#0d2044;color:white}
+.field input:focus,.field select:focus{background:rgba(255,255,255,.12);border-color:rgba(79,172,254,.6);box-shadow:0 0 0 3px rgba(26,86,219,.2)}
+
+/* aadhaar special */
+.aadhaar-wrap{position:relative}
+.aadhaar-wrap input{padding-right:5.5rem}
+.aadhaar-badge{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);font-size:.62rem;font-weight:600;background:rgba(224,36,36,.25);color:#fc8181;border:1px solid rgba(224,36,36,.3);border-radius:5px;padding:.18rem .5rem;letter-spacing:.04em;text-transform:uppercase;pointer-events:none}
+
+/* section divider */
+.sec-label{grid-column:1/-1;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:.75rem;margin-top:.5rem}
+.sec-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.1);flex-wrap:wrap;gap:1rem}
+.note{font-size:.75rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:.4rem}
+.note-dot{width:6px;height:6px;border-radius:50%;background:#0e9f6e;flex-shrink:0}
+
+.btn{
+  padding:.75rem 2.25rem;
+  background:linear-gradient(135deg,#1a56db 0%,#0e9f6e 100%);
+  color:white;border:none;border-radius:10px;
+  font-size:.9rem;font-weight:500;cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  transition:all .2s;box-shadow:0 8px 24px rgba(26,86,219,.35);
+  position:relative;overflow:hidden;
+}
+.btn::after{content:'';position:absolute;inset:0;background:white;opacity:0;transition:.2s}
+.btn:hover::after{opacity:.1}
+.btn:hover{box-shadow:0 12px 32px rgba(26,86,219,.45)}
+.btn:active{transform:scale(.97)}
+
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}.field.full{grid-column:1}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="floaters" id="floaters"></div>
+
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">Medi<span>Hub</span></div>
+    <div class="already">Already a member? <a href="index.html">Log in</a></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Create your account</h2>
+      <p>Fill in your details to get started — takes about 2 minutes</p>
+    </div>
+
+    <div class="steps">
+      <div class="step-dot done"></div>
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+    </div>
+
+    <div class="form-grid">
+      <div class="sec-label">Personal information</div>
+
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" placeholder="John Doe">
+      </div>
+      <div class="field">
+        <label>Age</label>
+        <input type="number" placeholder="35" min="0" max="120">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <select>
+          <option value="">Select gender</option>
+          <option>Male</option><option>Female</option><option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Blood group</label>
+        <select>
+          <option value="">Select</option>
+          <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+          <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Mother tongue</label>
+        <input type="text" placeholder="Tamil, Hindi, Bengali…">
+      </div>
+
+      <div class="sec-label">Contact details</div>
+
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" placeholder="+91 XXXXX XXXXX">
+      </div>
+      <div class="field full">
+        <label>Home address</label>
+        <input type="text" placeholder="Street, City, State, PIN">
+      </div>
+
+      <div class="sec-label">Identity verification</div>
+
+      <div class="field full">
+        <label>Aadhaar number</label>
+        <div class="aadhaar-wrap">
+          <input type="text" placeholder="12-digit Aadhaar number" maxlength="12" pattern="\d{12}" inputmode="numeric">
+          <span class="aadhaar-badge">Mandatory</span>
+        </div>
+      </div>
+
+      <div class="sec-label">Secure access</div>
+
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="Min. 8 characters">
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <input type="password" placeholder="Repeat password">
+      </div>
+    </div>
+
+    <div class="foot">
+      <div class="note"><div class="note-dot"></div>Your data is encrypted and never shared</div>
+      <button class="btn" onclick="window.location.href='dashboard.html'">Create account →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+function P(){this.reset=function(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*2+.5;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.a=Math.random()*.45+.1};this.reset()}
+for(let i=0;i<110;i++){let p=new P();particles.push(p)}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  let bg=ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#020c1b');bg.addColorStop(.6,'#04152d');bg.addColorStop(1,'#051c38');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  [[W*.2,H*.5,200,'rgba(14,159,110,.11)'],[W*.75,H*.3,250,'rgba(26,86,219,.13)'],[W*.5,H*.8,180,'rgba(79,172,254,.08)']].forEach(([x,y,r,c])=>{let g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)});
+  particles.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W||p.y<0||p.y>H)p.reset()});
+  for(let i=0;i<particles.length;i++)for(let j=i+1;j<particles.length;j++){let d=Math.hypot(particles[i].x-particles[j].x,particles[i].y-particles[j].y);if(d<85){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(14,159,110,${.15*(1-d/85)})`;ctx.lineWidth=.5;ctx.stroke()}}
+  requestAnimationFrame(draw)
+}
+draw();
+const icons=[`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>`,`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>`,`<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`,`<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>`];
+const fl=document.getElementById('floaters');
+for(let i=0;i<16;i++){const el=document.createElement('div');el.className='floater';el.innerHTML=icons[i%icons.length];el.style.cssText=`left:${Math.random()*100}%;animation-duration:${14+Math.random()*18}s;animation-delay:${Math.random()*-28}s`;fl.appendChild(el)}
+</script>
+</body>
+</html>
